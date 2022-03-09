@@ -58,7 +58,7 @@ exports.modify = (req, res, next) => {
 
   /**
    * Si présence d'un fichier construction d'un objet qui contiendra le parse du body
-   * ainsi que l'image irl du nouveau fichier sinon on récupère le body directement
+   * ainsi que l'image url du nouveau fichier sinon on récupère le body directement
    */
     ? {
         ...JSON.parse(req.body.sauce),
@@ -153,8 +153,7 @@ exports.like = (req, res, next) => {
           //retour status quo
         default:
           removeFrom(sauce.usersLiked, req.body.userId);
-          removeFrom(sauce.usersLiked, req.body.userId);
-          index = sauce.usersLiked.indexOf(req.body.userId);
+          removeFrom(sauce.usersDisliked, req.body.userId);
           message = "Sauce Ignored";
           break;
       }
