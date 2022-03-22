@@ -1,7 +1,7 @@
 /**
  * importation bibliothèques
  */
-const jsToken = require("jsonwebtoken");
+const jwt = require("jsonwebtoken");
 const bcrypt = require("bcrypt");
 const passwordValidator = require("password-validator");
 
@@ -84,7 +84,7 @@ exports.login = (req, res, next) => {
           }
           res.status(200).json({
             userId: user._id,
-            token: jsToken.sign({ userId: user._id }, env.secret, { expiresIn: "24h" }),
+            token: jwt.sign({ userId: user._id }, env.secret, { expiresIn: "24h" }),
           });
         })
         .catch(error => res.status(500).json({ error: "Internal Server Error" }));

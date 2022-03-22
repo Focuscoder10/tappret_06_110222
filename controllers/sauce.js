@@ -163,7 +163,7 @@ exports.like = (req, res, next) => {
       sauce.likes = sauce.usersLiked.length;
       sauce.dislikes = sauce.usersDisliked.length;
       sauce
-        .updateOne({ _id: req.params.id }, sauce)
+        .save()
         .then(() => {
           res.status(200).json({ message });
         })

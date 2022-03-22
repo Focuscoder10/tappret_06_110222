@@ -5,10 +5,26 @@ const express = require("express");
 const mongoose = require("mongoose");
 const helmet = require("helmet");
 const path = require("path");
+const cors = require("./middleware/cors");
+const fs = require("fs");
 
 const env = require("./env");
 
 const app = express();
+
+/**
+ * Creation du dossier images s'il n'existe pas
+ * Arrête l'application si une erreur se produit
+ */
+fs.exists("images", exists => {
+  if (!exists)
+    fs.mkdir("images", error => {
+      if (error) {
+        console.error(error);
+        process.exit(1);
+      }
+    });
+});
 
 /**
  * importations des routes requises
@@ -30,7 +46,7 @@ mongoose
 /**
  * middleware de sécurité
  */
-app.use(helmet({ crossOriginResourcePolicy: { policy: "same-site" } }));
+app.use(helmet());
 
 /**
  * middleware accès req.body
@@ -40,20 +56,16 @@ app.use(express.json());
 /**
  * Middleware d'authorisation des requêtes pour tout le monde(CORS)
  */
-app.use((req, res, next) => {
-  res.setHeader("Access-Control-Allow-Origin", "*");
-  res.setHeader(
-    "Access-Control-Allow-Headers",
-    "Origin, X-Requested-With, Content, Accept, Content-Type, Authorization"
-  );
-  res.setHeader("Access-Control-Allow-Methods", "GET, POST, PUT, DELETE, PATCH, OPTIONS");
-  next();
-});
+app.use(cors);
 
 /**
  * middleware qui sert les fichiers statiques du dossier images
  */
-app.use("/images", express.static(path.join(__dirname, "images")));
+app.use(
+  "/images",
+  helmet.crossOriginResourcePolicy({ policy: "cross-origin" }),
+  express.static(path.join(__dirname, "images"))
+);
 
 /**définie les routers associés aux différents endpoint */
 app.use("/api/sauces", sauceRoutes);

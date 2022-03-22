@@ -1,7 +1,8 @@
 /**
  * importation de la bibliothèque jsonwebtoken
  */
-const jsToken = require("jsonwebtoken");
+const jwt = require("jsonwebtoken");
+const bearer = /^Bearer ([\w\.-]+)$/;
 
 /**
  * importation de la configuration
@@ -17,12 +18,13 @@ module.exports = (req, res, next) => {
      * vérifie la présence d'un headers authentification
      * vérifie si il est splitable
      */
-    const token = req.headers.authorization.split(" ")[1];
+    const match = req.headers.authorization.match(bearer);
+    if (!match) throw new Error("Invalid Bearer Auth");
 
     /**
      * vérifie que le token est bien décriptable avec la clé secrète
      */
-    const decodedToken = jsToken.verify(token, env.secret);
+    const decodedToken = jwt.verify(match[1], env.secret);
     const userId = decodedToken.userId;
 
     /**
@@ -33,7 +35,8 @@ module.exports = (req, res, next) => {
     /**
      * vérifie que l'userId du body correspond à l'userId du token
      */
-    if (req.body.userId && req.body.userId !== userId) throw new Error("Invalid User ID");
+    if (req.body.userId && req.body.userId !== userId)
+      throw new Error("Invalid User ID");
 
     /**
      * si tout est ok passe au middleware suivant
